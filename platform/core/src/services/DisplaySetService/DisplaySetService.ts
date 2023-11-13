@@ -307,7 +307,9 @@ export default class DisplaySetService extends PubSubService {
   private _makeDisplaySetForInstances(instancesSrc: InstanceMetadata[], settings): DisplaySet[] {
     // Some of the sop class handlers take a direct reference to instances
     // so make sure it gets copied here so that they have their own ref
-    let instances = [...instancesSrc];
+    let instances = [...instancesSrc].sort((a, b) => {
+      return a.InstanceNumber - b.InstanceNumber;
+    });
     const instance = instances[0];
 
     const existingDisplaySets = this.getDisplaySetsForSeries(instance.SeriesInstanceUID) || [];

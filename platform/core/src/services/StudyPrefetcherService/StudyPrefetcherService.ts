@@ -165,6 +165,7 @@ class StudyPrefetcherService extends PubSubService {
     this._subscriptions = [];
 
     Object.assign(this.config, configuration);
+    console.log(this.config);
   }
 
   public onModeEnter(): void {

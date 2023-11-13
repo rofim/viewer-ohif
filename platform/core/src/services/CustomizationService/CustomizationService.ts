@@ -413,6 +413,9 @@ export default class CustomizationService extends PubSubService {
     }
     if (typeof value === 'string') {
       const extensionValue = this.findExtensionValue(value);
+      if (!extensionValue) {
+        return;
+      }
       // The child of a reference is only a set of references when an array,
       // so call the addReference direct.  It could be a secondary reference perhaps
       this.addReference(extensionValue.value, type, extensionValue.name, extensionValue.merge);
