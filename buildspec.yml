@@ -30,7 +30,7 @@ phases:
         commands:
             - echo Deployment started on `date`
             # Copy all files with standard configuration #604800 = 7 days
-            - aws s3 sync --cache-control "public, max-age=604800" platform/app/dist/ s3://${S3_BUCKET}/_client/ --delete --exclude "index.html" --exclude "app-config.js" --exclude "silent-refresh.html"
+            - aws s3 sync --cache-control "public, max-age=604800" platform/app/dist/ s3://${S3_BUCKET}/ --delete --exclude "index.html" --exclude "app-config.js" --exclude "silent-refresh.html"
         # Add a "no-cache" metadata to prevent browser to keep cache of index.html and i18n folder (and contents)
             - aws s3 cp --cache-control "no-cache" platform/app/dist/index.html s3://${S3_BUCKET}/
             - aws s3 cp --cache-control "no-cache" platform/app/dist/silent-refresh.html s3://${S3_BUCKET}/

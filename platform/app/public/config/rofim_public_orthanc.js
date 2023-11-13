@@ -65,7 +65,7 @@ window.config = {
         singlepart: 'bulkdata,video,pdf,image,thumbnail',
         qidoSupportsIncludeField: true,
         supportsReject: true,
-        imageRendering: 'wadouri',
+        imageRendering: 'wadors',
         thumbnailRendering: 'wadors',
         // imageRendering: 'wadors',
         // thumbnailRendering: 'wadors',
