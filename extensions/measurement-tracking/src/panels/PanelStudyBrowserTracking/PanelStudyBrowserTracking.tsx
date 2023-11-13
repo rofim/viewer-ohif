@@ -126,7 +126,10 @@ function PanelStudyBrowserTracking({
       // try to fetch the prior studies based on the patientID if the
       // server can respond.
       try {
-        qidoStudiesForPatient = await getStudiesForPatientByMRN(qidoForStudyUID);
+        let result = await getStudiesForPatientByMRN(qidoForStudyUID);
+        if (qidoStudiesForPatient?.length === result.length) {
+          qidoStudiesForPatient = result;
+        }
       } catch (error) {
         console.warn(error);
       }
@@ -139,6 +142,7 @@ function PanelStudyBrowserTracking({
           description: qidoStudy.StudyDescription,
           modalities: qidoStudy.ModalitiesInStudy,
           numInstances: qidoStudy.NumInstances,
+          patientName: qidoStudy.PatientName,
         };
       });
 
@@ -277,7 +281,6 @@ function PanelStudyBrowserTracking({
             return;
           }
 
-          // When the image arrives, render it and store the result in the thumbnailImgSrcMap
           newImageSrcEntry[displaySetInstanceUID] = await getImageSrc(imageId);
           setThumbnailImageSrcMap(prevState => {
             return { ...prevState, ...newImageSrcEntry };
@@ -589,6 +592,7 @@ function _mapDisplaySets(
         countIcon: ds.countIcon,
         messages: ds.messages,
         StudyInstanceUID: ds.StudyInstanceUID,
+        instanceNumber: ds.instanceNumber,
         componentType,
         imageSrc,
         dragData: {

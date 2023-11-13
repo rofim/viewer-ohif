@@ -10,6 +10,7 @@ const baseClasses =
 
 const StudyItem = ({
   date,
+  patientName,
   description,
   numInstances,
   modalities,
@@ -40,9 +41,10 @@ const StudyItem = ({
             {numInstances}
           </div>
         </div>
-        <div className="flex flex-row items-center py-1">
-          <div className="text-l flex items-center pr-5 text-blue-300">{modalities}</div>
-          <div className="flex items-center break-words text-base text-blue-300">{description}</div>
+        <div className="pr-5 text-xl text-white">{patientName}</div>
+        <div className="flex flex-row py-1">
+          <div className="pr-5 text-xl text-blue-300">{modalities}</div>
+          <div className="truncate-2-lines break-words text-base text-blue-300">{description}</div>
         </div>
       </div>
       {!!trackedSeries && (
@@ -70,6 +72,7 @@ const StudyItem = ({
 StudyItem.propTypes = {
   date: PropTypes.string.isRequired,
   description: PropTypes.string,
+  patientName: PropTypes.string,
   modalities: PropTypes.string.isRequired,
   numInstances: PropTypes.number.isRequired,
   trackedSeries: PropTypes.number,
