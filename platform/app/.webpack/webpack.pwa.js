@@ -17,6 +17,7 @@ const PUBLIC_DIR = path.join(__dirname, '../public');
 // ~~ Env Vars
 const HTML_TEMPLATE = process.env.HTML_TEMPLATE || 'index.html';
 const PUBLIC_URL = process.env.PUBLIC_URL || '/';
+const ORTHANC_URL = process.env.ORTHANC_URL;
 const APP_CONFIG = process.env.APP_CONFIG || 'config/default.js';
 
 // proxy settings
@@ -132,6 +133,7 @@ module.exports = (env, argv) => {
         filename: 'index.html',
         templateParameters: {
           PUBLIC_URL: PUBLIC_URL,
+          ORTHANC_URL: ORTHANC_URL,
         },
       }),
       // Generate a service worker for fast local loads
