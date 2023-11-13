@@ -387,9 +387,11 @@ function createDicomWebApi(dicomWebConfig, servicesManager) {
        * This is done recursively, for sub-sequences.
        */
       const addRetrieveBulkDataNaturalized = (naturalized, instance = naturalized) => {
+        if (!naturalized) {
+          return naturalized;
+        }
         for (const key of Object.keys(naturalized)) {
           const value = naturalized[key];
-
           if (Array.isArray(value) && typeof value[0] === 'object') {
             // Fix recursive values
             value.forEach(child => addRetrieveBulkDataNaturalized(child, instance));
