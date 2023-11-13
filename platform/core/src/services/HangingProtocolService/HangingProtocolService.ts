@@ -1536,6 +1536,7 @@ export default class HangingProtocolService extends PubSubService {
           sortingInfo: {
             score: totalMatchScore,
             study: study.StudyInstanceUID,
+            instanceNumber: displaySet.instanceNumber,
             ...this._getSeriesSortInfoForDisplaySetSort(displaySet),
           },
         };
