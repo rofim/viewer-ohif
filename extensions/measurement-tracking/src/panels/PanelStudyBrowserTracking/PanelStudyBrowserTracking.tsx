@@ -146,7 +146,10 @@ export default function PanelStudyBrowserTracking({
       // try to fetch the prior studies based on the patientID if the
       // server can respond.
       try {
-        qidoStudiesForPatient = await getStudiesForPatientByMRN(qidoForStudyUID);
+        const result = await getStudiesForPatientByMRN(qidoForStudyUID);
+        if (qidoStudiesForPatient?.length === result.length) {
+          qidoStudiesForPatient = result;
+        }
       } catch (error) {
         console.warn(error);
       }
@@ -611,6 +614,7 @@ function _mapDisplaySets(
         countIcon: ds.countIcon,
         messages: ds.messages,
         StudyInstanceUID: ds.StudyInstanceUID,
+        instanceNumber: ds.instanceNumber,
         componentType,
         imageSrc,
         dragData: {
