@@ -15,7 +15,7 @@ export function Toolbar({ servicesManager, buttonSection = 'primary' }) {
 
   return (
     <>
-      {toolbarButtons.map(toolDef => {
+      {toolbarButtons.filter(toolDef => toolDef.id !== 'MPR').map(toolDef => {
         if (!toolDef) {
           return null;
         }
