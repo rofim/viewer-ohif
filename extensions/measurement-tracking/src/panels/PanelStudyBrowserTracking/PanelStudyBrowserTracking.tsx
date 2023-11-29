@@ -106,6 +106,7 @@ function PanelStudyBrowserTracking({
           description: qidoStudy.StudyDescription,
           modalities: qidoStudy.ModalitiesInStudy,
           numInstances: qidoStudy.NumInstances,
+          patientName: qidoStudy.PatientName,
         };
       });
 
@@ -492,6 +493,7 @@ function _mapDisplaySets(
         countIcon: ds.countIcon,
         messages: ds.messages,
         StudyInstanceUID: ds.StudyInstanceUID,
+        instanceNumber: ds.instanceNumber,
         componentType,
         imageSrc,
         dragData: {

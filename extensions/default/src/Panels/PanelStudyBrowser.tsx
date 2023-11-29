@@ -89,6 +89,7 @@ function PanelStudyBrowser({
           description: qidoStudy.StudyDescription,
           modalities: qidoStudy.ModalitiesInStudy,
           numInstances: qidoStudy.NumInstances,
+          patientName: qidoStudy.PatientName,
         };
       });
 

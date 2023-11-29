@@ -1540,6 +1540,7 @@ export default class HangingProtocolService extends PubSubService {
           sortingInfo: {
             score: totalMatchScore,
             study: study.StudyInstanceUID,
+            instanceNumber: displaySet.instanceNumber,
             ...this._getSeriesSortInfoForDisplaySetSort(displaySet),
           },
         };
@@ -1581,8 +1582,8 @@ export default class HangingProtocolService extends PubSubService {
     return {
       [this._getSeriesFieldForDisplaySetSort().name]:
         displaySet.SeriesNumber != null
-          ? parseInt(displaySet.SeriesNumber)
-          : parseInt(displaySet.seriesNumber),
+          ? parseInt(displaySet.SeriesNumber) * 10 + displaySet.instanceNumber
+          : parseInt(displaySet.seriesNumber) * 10 + displaySet.instanceNumber,
     };
   }
 
