@@ -211,7 +211,6 @@ function PanelStudyBrowserTracking({
             return;
           }
 
-          // When the image arrives, render it and store the result in the thumbnailImgSrcMap
           newImageSrcEntry[displaySetInstanceUID] = await getImageSrc(imageId);
           setThumbnailImageSrcMap(prevState => {
             return { ...prevState, ...newImageSrcEntry };
