@@ -29,8 +29,12 @@ phases:
     post_build:
         commands:
             - echo Deployment started on `date`
-            # Copy dist folder to S3 bucket, As of Angular 6, builds are stored inside an app folder in distribution and not at the root of the dist folder
-            - aws s3 sync platform/app/dist/ s3://${S3_BUCKET}/ --delete
+            # Copy all files with standard configuration #604800 = 7 days
+            - aws s3 sync --cache-control "public, max-age=604800" platform/app/dist/ s3://${S3_BUCKET}/_client/ --delete --exclude "index.html" --exclude "app-config.js" --exclude "silent-refresh.html"
+        # Add a "no-cache" metadata to prevent browser to keep cache of index.html and i18n folder (and contents)
+            - aws s3 cp --cache-control "no-cache" platform/app/dist/index.html s3://${S3_BUCKET}/
+            - aws s3 cp --cache-control "no-cache" platform/app/dist/silent-refresh.html s3://${S3_BUCKET}/
+            - aws s3 cp --cache-control "no-cache" platform/app/dist/app-config.js s3://${S3_BUCKET}/
             # Invalidate files on CloudFront
             - aws cloudfront create-invalidation --distribution-id ${CLOUDFRONT_DISTRIB} --paths '/*'
             - echo Deployment completed on `date`
