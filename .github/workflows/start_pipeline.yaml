@@ -65,23 +65,17 @@ jobs:
           ENVIRONMENT: ${{ inputs.environment }}
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ env.AWS_ROLE_ARN }}
           aws-region: eu-west-1
 
-      - name: Put branch/tag in paramter store
-        run: |
-          aws ssm put-parameter --name "/${PROJECT}/${ENVIRONMENT}/cicd/${APP}/revision" --type "String" --value "${{ steps.branch_tag_name.outputs.branch_or_tag }}" --overwrite
-        env:
-          ENVIRONMENT: ${{ inputs.environment }}
-          APP: ${{ inputs.app }}
-
       - name: Start AWS pipeline
         id: start-pipeline
         run: |
-          pipelineExecutionId=$(aws codepipeline start-pipeline-execution --name rofim-$ENVIRONMENT-$APP |jq .pipelineExecutionId)
-          echo "::set-output name=pipelineExecutionId::$pipelineExecutionId"
+          commit_id=$(git rev-parse "${{ steps.branch_tag_name.outputs.branch_or_tag }}")
+          pipelineExecutionId=$(aws codepipeline start-pipeline-execution --name rofim-$ENVIRONMENT-$APP --source-revisions  actionName=Source,revisionType=COMMIT_ID,revisionValue=$commit_id |jq .pipelineExecutionId)
+          echo "pipelineExecutionId=$pipelineExecutionId" >> $GITHUB_OUTPUT
         env:
           ENVIRONMENT: ${{ inputs.environment }}
           APP: ${{ inputs.app }}
