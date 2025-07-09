@@ -11,8 +11,6 @@ phases:
         runtime-versions:
             nodejs: 18
         commands:
-            # Get latest revision
-            - git checkout $(aws ssm get-parameter --name /${PROJECT}/${ENVIRONMENT}/cicd/${APP}/revision | jq -r .Parameter.Value)
             # Install node dependancies.
             #- npm config set @rofim:registry https://npm.pkg.github.com
             #- npm config set //npm.pkg.github.com/:_authToken=${GITHUB_NPM_PASSWORD}
