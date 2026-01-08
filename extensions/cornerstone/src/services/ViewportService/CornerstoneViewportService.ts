@@ -44,6 +44,7 @@ const EVENTS = {
 
 const MIN_STACK_VIEWPORTS_TO_ENQUEUE_RESIZE = 12;
 const MIN_VOLUME_VIEWPORTS_TO_ENQUEUE_RESIZE = 6;
+const MAX_STACK_IMAGES = 500;
 
 export const WITH_NAVIGATION = { withNavigation: true, withOrientation: false };
 export const WITH_ORIENTATION = { withNavigation: true, withOrientation: true };
@@ -753,7 +754,10 @@ class CornerstoneViewportService extends PubSubService implements IViewportServi
       initialImageIndexToUse = this._getInitialImageIndexForViewport(viewportInfo, imageIds) || 0;
     }
 
-    return viewport.setStack(imageIds, initialImageIndexToUse).then(() => {
+    const { sampledImageIds, mapIndex } = this._getSampledImageIds(imageIds);
+    const sampledInitialImageIndexToUse = mapIndex(initialImageIndexToUse);
+
+    return viewport.setStack(sampledImageIds, sampledInitialImageIndexToUse).then(() => {
       viewport.setProperties({ ...properties });
       this.setPresentations(viewport.id, presentations, viewportInfo);
 
@@ -833,6 +837,40 @@ class CornerstoneViewportService extends PubSubService implements IViewportServi
     }
 
     return 0;
+  }
+
+  _getSampledImageIds(imageIds: string[]): {
+    sampledImageIds: string[];
+    mapIndex: (index: number) => number;
+  } {
+    if (imageIds.length <= MAX_STACK_IMAGES) {
+      return {
+        sampledImageIds: imageIds,
+        mapIndex: (index: number) => index,
+      };
+    }
+
+    const sampledImageIds = [];
+    // const validIndices = new Set();
+    const step = (imageIds.length - 1) / (MAX_STACK_IMAGES - 1);
+
+    for (let i = 0; i < MAX_STACK_IMAGES; i++) {
+      const originalIndex = Math.round(i * step);
+      // validIndices.add(originalIndex);
+      sampledImageIds.push(imageIds[originalIndex]);
+    }
+
+    // Ensure last image is always included/correct
+    if (sampledImageIds[sampledImageIds.length - 1] !== imageIds[imageIds.length - 1]) {
+      sampledImageIds[sampledImageIds.length - 1] = imageIds[imageIds.length - 1];
+    }
+
+    const mapIndex = (originalIndex: number) => {
+      const computedIndex = Math.round(originalIndex / step);
+      return Math.min(Math.max(computedIndex, 0), MAX_STACK_IMAGES - 1);
+    };
+
+    return { sampledImageIds, mapIndex };
   }
 
   async _setVolumeViewport(
