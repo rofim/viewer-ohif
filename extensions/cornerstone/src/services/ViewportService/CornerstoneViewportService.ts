@@ -44,7 +44,8 @@ const EVENTS = {
 
 const MIN_STACK_VIEWPORTS_TO_ENQUEUE_RESIZE = 12;
 const MIN_VOLUME_VIEWPORTS_TO_ENQUEUE_RESIZE = 6;
-const MAX_STACK_IMAGES = 500;
+const MAX_VIDEO_IMAGES = 500;
+const MAX_CMS_IMAGES = 1000;
 
 export const WITH_NAVIGATION = { withNavigation: true, withOrientation: false };
 export const WITH_ORIENTATION = { withNavigation: true, withOrientation: true };
@@ -704,7 +705,24 @@ class CornerstoneViewportService extends PubSubService implements IViewportServi
 
     this.viewportsDisplaySets.set(viewport.id, [...displaySetInstanceUIDs]);
 
-    const { initialImageIndex, imageIds } = viewportData.data[0];
+    const { displaySetService } = this.servicesManager.services;
+    const displaySet = displaySetService.getDisplaySetByUID(displaySetInstanceUIDs[0]);
+
+    // [DUAL LIMIT LIMITATION TASK]
+    // Check if this is a "Video" (has FrameRate/Time) or a regular Stack.
+    const { imageIds, initialImageIndex } = viewportData.data[0];
+    const isVideo = displaySet?.FrameRate || displaySet?.FrameTime;
+
+    let maxStackImages;
+    if (isVideo) {
+        // Video -> 500 images (Performance critical)
+        maxStackImages = MAX_VIDEO_IMAGES;
+    } else {
+        // Standard Stack Logic:
+        // [USER REQUEST] "Remove the adaptation for anything else that video"
+        // Show all images without sampling/decimation.
+        maxStackImages = imageIds.length;
+    }
 
     // Use the slice index from any provided view reference, as the view reference
     // is being used to navigate to the initial view position for measurement
@@ -754,7 +772,7 @@ class CornerstoneViewportService extends PubSubService implements IViewportServi
       initialImageIndexToUse = this._getInitialImageIndexForViewport(viewportInfo, imageIds) || 0;
     }
 
-    const { sampledImageIds, mapIndex } = this._getSampledImageIds(imageIds);
+    const { sampledImageIds, mapIndex } = this._getSampledImageIds(imageIds, maxStackImages);
     const sampledInitialImageIndexToUse = mapIndex(initialImageIndexToUse);
 
     return viewport.setStack(sampledImageIds, sampledInitialImageIndexToUse).then(() => {
@@ -839,11 +857,14 @@ class CornerstoneViewportService extends PubSubService implements IViewportServi
     return 0;
   }
 
-  _getSampledImageIds(imageIds: string[]): {
+  _getSampledImageIds(
+    imageIds: string[],
+    limit: number
+  ): {
     sampledImageIds: string[];
     mapIndex: (index: number) => number;
   } {
-    if (imageIds.length <= MAX_STACK_IMAGES) {
+    if (imageIds.length <= limit) {
       return {
         sampledImageIds: imageIds,
         mapIndex: (index: number) => index,
@@ -851,12 +872,10 @@ class CornerstoneViewportService extends PubSubService implements IViewportServi
     }
 
     const sampledImageIds = [];
-    // const validIndices = new Set();
-    const step = (imageIds.length - 1) / (MAX_STACK_IMAGES - 1);
+    const step = (imageIds.length - 1) / (limit - 1);
 
-    for (let i = 0; i < MAX_STACK_IMAGES; i++) {
+    for (let i = 0; i < limit; i++) {
       const originalIndex = Math.round(i * step);
-      // validIndices.add(originalIndex);
       sampledImageIds.push(imageIds[originalIndex]);
     }
 
@@ -867,7 +886,7 @@ class CornerstoneViewportService extends PubSubService implements IViewportServi
 
     const mapIndex = (originalIndex: number) => {
       const computedIndex = Math.round(originalIndex / step);
-      return Math.min(Math.max(computedIndex, 0), MAX_STACK_IMAGES - 1);
+      return Math.min(Math.max(computedIndex, 0), limit - 1);
     };
 
     return { sampledImageIds, mapIndex };
