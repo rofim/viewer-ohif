@@ -11,7 +11,12 @@ function WrappedCinePlayer({
   enabledVPElement: HTMLElement;
   viewportId: string;
 }>) {
-  const { customizationService, displaySetService, viewportGridService } = servicesManager.services;
+  const {
+    customizationService,
+    displaySetService,
+    viewportGridService,
+    cornerstoneViewportService, // Needed for viewport details
+  } = servicesManager.services;
   const [{ isCineEnabled, cines }, cineService] = useCine();
   const [newStackFrameRate, setNewStackFrameRate] = useState(24);
   const [dynamicInfo, setDynamicInfo] = useState(null);
@@ -70,8 +75,47 @@ function WrappedCinePlayer({
     if (isPlaying) {
       cineService.setIsCineEnabled(isPlaying);
     }
-    cineService.setCine({ id: viewportId, isPlaying, frameRate });
-    setNewStackFrameRate(frameRate);
+
+    console.log(`[CinePlayer Original Debug] Metadata Detected FPS: ${frameRate}`);
+
+    // --- Advanced Calculation (Dry Run / Logging Only) ---
+    // This logic calculates what the FPS *should* be if we were to adapt for downsampling
+    try {
+      var dryRunFPS = frameRate;
+        // 2. Downsampling Ratio Logic
+        const viewport = cornerstoneViewportService.getCornerstoneViewport(viewportId);
+        if (viewport && viewport.getImageIds) {
+             const currentImageIds = viewport.getImageIds();
+             const displaySet = displaySetService.getDisplaySetByUID(displaySetInstanceUIDs[0]);
+
+             if (displaySet && currentImageIds.length > 0) {
+                 // For Multi-frame DICOM, images.length is 1, but numImageFrames is the real count.
+                 // For single-frame series, images.length is the count and numImageFrames is undefined/0.
+                 const totalImages = displaySet.numImageFrames > 1
+                    ? displaySet.numImageFrames
+                    : (displaySet.images?.length || 0);
+
+                 const currentImages = currentImageIds.length;
+                 const ratio = totalImages > 0 ? currentImages / totalImages : 1;
+
+                 console.log(`[CinePlayer Calculation] Ratio Check: Current ${currentImages} / Total ${totalImages} = ${ratio}`);
+
+                 if (ratio < 1.0 && ratio > 0) {
+                   dryRunFPS = frameRate * ratio;
+                     console.log(
+                       `[CinePlayer Calculation] Suggested Adapted FPS: ${dryRunFPS} (Dry Run: Not Applied)`
+                     );
+                 } else {
+                     console.log(`[CinePlayer Calculation] No downsampling detected (Ratio >= 1). Suggested FPS: ${dryRunFPS}`);
+                 }
+             }
+        }
+    } catch (err) {
+        console.warn('[CinePlayer Calculation] Error during dry run calc:', err);
+    }
+
+    cineService.setCine({ id: viewportId, isPlaying, frameRate: dryRunFPS });
+    setNewStackFrameRate(dryRunFPS);
   }, [displaySetService, viewportId, viewportGridService, cines, isCineEnabled, enabledVPElement]);
 
   useEffect(() => {
