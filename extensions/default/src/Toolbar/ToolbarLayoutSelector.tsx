@@ -130,6 +130,7 @@ function ToolbarLayoutSelectorWithServices({
     <div
       id="Layout"
       data-cy="Layout"
+      className={props.className}
     >
       <LayoutSelector
         onSelectionChange={handleSelectionChange}

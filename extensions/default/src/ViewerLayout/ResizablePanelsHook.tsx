@@ -36,9 +36,18 @@ const useResizablePanels = (
   leftPanelMinimumExpandedWidth,
   rightPanelMinimumExpandedWidth
 ) => {
+  // Mobile/Tablet: Force Left Panel to 150px width
+  // Detect touch devices (iPad/Phone) via pointer, touch points, OR small screens
+  const isMobile = typeof window !== 'undefined' && (
+      (window.matchMedia && window.matchMedia('(any-pointer: coarse)').matches) ||
+      (navigator.maxTouchPoints > 0) ||
+      window.innerWidth < 1024
+  );
+  const effectiveLeftPanelWidth = isMobile ? 150 : leftPanelInitialExpandedWidth;
+
   const [panelGroupDefinition] = useState(
     getPanelGroupDefinition({
-      leftPanelInitialExpandedWidth,
+      leftPanelInitialExpandedWidth: effectiveLeftPanelWidth,
       rightPanelInitialExpandedWidth,
       leftPanelMinimumExpandedWidth,
       rightPanelMinimumExpandedWidth,

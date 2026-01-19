@@ -17,10 +17,20 @@ const formatWithEllipsis = (str, maxLength) => {
 };
 
 function HeaderPatientInfo({ servicesManager, appConfig }: withAppTypes) {
-  const initialExpandedState =
-    appConfig.showPatientInfo === PatientInfoVisibility.VISIBLE ||
-    appConfig.showPatientInfo === PatientInfoVisibility.VISIBLE_READONLY;
-  const [expanded, setExpanded] = useState(initialExpandedState);
+  const [expanded, setExpanded] = useState(() => {
+    // Mobile/Tablet: Start as Collapsed (Not Expanded)
+    if (typeof window !== 'undefined' && (
+        (window.matchMedia && window.matchMedia('(any-pointer: coarse)').matches) ||
+        (navigator.maxTouchPoints > 0) ||
+        window.innerWidth < 1024
+      )) {
+      return false;
+    }
+    return (
+      appConfig.showPatientInfo === PatientInfoVisibility.VISIBLE ||
+      appConfig.showPatientInfo === PatientInfoVisibility.VISIBLE_READONLY
+    );
+  });
   const { patientInfo, isMixedPatients } = usePatientInfo(servicesManager);
 
   useEffect(() => {

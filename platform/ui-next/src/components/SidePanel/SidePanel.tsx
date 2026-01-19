@@ -443,12 +443,17 @@ const SidePanel = ({
   const getOpenStateComponent = () => {
     return (
       <>
-        <div className="bg-bkg-med flex h-[40px] flex-shrink-0 select-none rounded-t p-2">
+        <div
+          className={classnames(
+            'bg-bkg-med flex h-[40px] flex-shrink-0 select-none rounded-t p-2',
+            { 'hidden lg:flex': side === 'left' }
+          )}
+        >
           {tabs.length === 1 ? getOneTabComponent() : getTabGridComponent()}
         </div>
         <Separator
           orientation="horizontal"
-          className="bg-black"
+          className={classnames('bg-black', { 'hidden lg:block': side === 'left' })}
           thickness="2px"
         />
       </>

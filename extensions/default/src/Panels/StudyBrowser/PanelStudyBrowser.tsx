@@ -102,6 +102,21 @@ function PanelStudyBrowser({
     ]
   );
 
+  // Mobile/Tablet: Single tap to load series (instead of double tap)
+  const onClickThumbnailHandler = useCallback(
+    displaySetInstanceUID => {
+      const isMobile =
+        (window.matchMedia && window.matchMedia('(any-pointer: coarse)').matches) ||
+        (navigator.maxTouchPoints > 0) ||
+        window.innerWidth < 1024;
+
+      if (isMobile) {
+        onDoubleClickThumbnailHandler(displaySetInstanceUID);
+      }
+    },
+    [onDoubleClickThumbnailHandler]
+  );
+
   // ~~ studyDisplayList
   useEffect(() => {
     // Fetch all studies for the patient in each primary study
@@ -422,7 +437,7 @@ function PanelStudyBrowser({
           setActiveTabName(clickedTabName);
         }}
         onClickUntrack={onClickUntrack}
-        onClickThumbnail={() => {}}
+        onClickThumbnail={onClickThumbnailHandler}
         onDoubleClickThumbnail={onDoubleClickThumbnailHandler}
         activeDisplaySetInstanceUIDs={activeDisplaySetInstanceUIDs}
         showSettings={actionIcons.find(icon => icon.id === 'settings')?.value}

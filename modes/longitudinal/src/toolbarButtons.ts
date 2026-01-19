@@ -632,7 +632,7 @@ const toolbarButtons: Button[] = [
     props: {
       rows: 3,
       columns: 4,
-      evaluate: 'evaluate.action',
+      evaluate: ['evaluate.action', 'evaluate.notMobile'],
     },
   },
   {
@@ -678,32 +678,38 @@ const toolbarButtons: Button[] = [
       ],
     },
   },
-  // {
-  //   id: 'Undo',
-  //   uiType: 'ohif.toolButton',
-  //   props: {
-  //     type: 'tool',
-  //     icon: 'prev-arrow',
-  //     label: 'Undo',
-  //     commands: {
-  //       commandName: 'undo',
-  //     },
-  //     evaluate: 'evaluate.action',
-  //   },
-  // },
-  // {
-  //   id: 'Redo',
-  //   uiType: 'ohif.toolButton',
-  //   props: {
-  //     type: 'tool',
-  //     icon: 'next-arrow',
-  //     label: 'Redo',
-  //     commands: {
-  //       commandName: 'redo',
-  //     },
-  //     evaluate: 'evaluate.action',
-  //   },
-  // },
+  {
+    id: 'Undo',
+    uiType: 'ohif.toolButton',
+    props: {
+      type: 'tool',
+      icon: 'prev-arrow',
+      label: 'Undo',
+      commands: {
+        commandName: 'undo',
+      },
+      evaluate: {
+        name: 'evaluate.notMobile',
+        hideWhenDisabled: true,
+      },
+    },
+  },
+  {
+    id: 'Redo',
+    uiType: 'ohif.toolButton',
+    props: {
+      type: 'tool',
+      icon: 'next-arrow',
+      label: 'Redo',
+      commands: {
+        commandName: 'redo',
+      },
+      evaluate: {
+        name: 'evaluate.notMobile',
+        hideWhenDisabled: true,
+      },
+    },
+  },
 ];
 
 export default toolbarButtons;

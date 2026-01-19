@@ -197,23 +197,7 @@ function ViewerLayout({
                 </div>
               </div>
             </ResizablePanel>
-            {hasRightPanels ? (
-              <>
-                <ResizableHandle
-                  onDragging={onHandleDragging}
-                  disabled={!rightPanelResizable}
-                  className={resizableHandleClassName}
-                />
-                <ResizablePanel {...resizableRightPanelProps}>
-                  <SidePanelWithServices
-                    side="right"
-                    isExpanded={!rightPanelClosedState}
-                    servicesManager={servicesManager}
-                    {...rightPanelProps}
-                  />
-                </ResizablePanel>
-              </>
-            ) : null}
+            {null}
           </ResizablePanelGroup>
         </React.Fragment>
       </div>

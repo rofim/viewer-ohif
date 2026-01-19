@@ -46,8 +46,28 @@ const Thumbnail = ({
   });
 
   const [lastTap, setLastTap] = useState(0);
+  const touchStartRef = React.useRef({ x: 0, y: 0 });
+
+  const handleTouchStart = e => {
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY
+    };
+  };
 
   const handleTouchEnd = e => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+
+    // Calculate distance moved
+    const deltaX = Math.abs(touchEndX - touchStartRef.current.x);
+    const deltaY = Math.abs(touchEndY - touchStartRef.current.y);
+
+    // If moved more than 10px, treat as scroll and ignore tap
+    if (deltaX > 10 || deltaY > 10) {
+      return;
+    }
+
     const currentTime = new Date().getTime();
     const tapLength = currentTime - lastTap;
     if (tapLength < 300 && tapLength > 0) {
@@ -266,6 +286,7 @@ const Thumbnail = ({
       data-series={seriesNumber}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
+      onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       role="button"
     >

@@ -550,6 +550,30 @@ export default function getToolbarModule({ servicesManager, extensionManager }: 
         };
       },
     },
+    {
+      name: 'evaluate.notMobile',
+      evaluate: () => {
+        // Improved Mobile/Tablet Detection (consistent with MobileScrollSlider)
+        const userAgent = window.navigator.userAgent;
+        const isIpad = /iPad/i.test(userAgent) || (/Macintosh/i.test(userAgent) && navigator.maxTouchPoints > 0);
+        const isTouch =
+          (window.matchMedia && window.matchMedia('(any-pointer: coarse)').matches) ||
+          (navigator.maxTouchPoints > 0) ||
+          isIpad;
+
+        const isMobile = isTouch || window.innerWidth < 1024;
+
+        if (isMobile) {
+          return {
+            className: '!hidden',
+          };
+        }
+
+        return {
+          disabled: false,
+        };
+      },
+    },
   ];
 }
 

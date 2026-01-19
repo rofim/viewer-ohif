@@ -10,6 +10,7 @@ import { setEnabledElement } from '../state';
 import './OHIFCornerstoneViewport.css';
 import CornerstoneOverlays from './Overlays/CornerstoneOverlays';
 import CinePlayer from '../components/CinePlayer';
+import MobileScrollSlider from '../components/MobileScrollSlider/MobileScrollSlider';
 import type { Types } from '@ohif/core';
 
 import OHIFViewportActionCorners from '../components/OHIFViewportActionCorners';
@@ -307,11 +308,17 @@ const OHIFCornerstoneViewport = React.memo(
     const Notification = customizationService.getCustomization('ui.notificationComponent');
 
     return (
-      <React.Fragment>
+      <div style={{ width: '100%', height: '100%', position: 'relative' }}>
         <div className="viewport-wrapper">
           <div
-            className="cornerstone-viewport-element"
-            style={{ height: '100%', width: '100%' }}
+            className="cornerstone-viewport-element select-none touch-none"
+            style={{
+              height: '100%',
+              width: '100%',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              WebkitTouchCallout: 'none'
+            }}
             onContextMenu={e => e.preventDefault()}
             onMouseDown={e => e.preventDefault()}
             data-viewportid={viewportId}
@@ -338,24 +345,30 @@ const OHIFCornerstoneViewport = React.memo(
             viewportId={viewportId}
             servicesManager={servicesManager}
           />
+           {/* The OHIFViewportActionCorners follows the viewport in the DOM so that it is naturally at a higher z-index inside the relative wrapper.*/}
+           <OHIFViewportActionCorners viewportId={viewportId} />
+
+           {/* Notification needs to be inside the relative wrapper to overlay correctly */}
+           <div className="absolute top-[24px] w-full">
+            {viewportDialogState.viewportId === viewportId && (
+              <Notification
+                id="viewport-notification"
+                message={viewportDialogState.message}
+                type={viewportDialogState.type}
+                actions={viewportDialogState.actions}
+                onSubmit={viewportDialogState.onSubmit}
+                onOutsideClick={viewportDialogState.onOutsideClick}
+                onKeyPress={viewportDialogState.onKeyPress}
+              />
+            )}
+          </div>
         </div>
-        {/* top offset of 24px to account for ViewportActionCorners. */}
-        <div className="absolute top-[24px] w-full">
-          {viewportDialogState.viewportId === viewportId && (
-            <Notification
-              id="viewport-notification"
-              message={viewportDialogState.message}
-              type={viewportDialogState.type}
-              actions={viewportDialogState.actions}
-              onSubmit={viewportDialogState.onSubmit}
-              onOutsideClick={viewportDialogState.onOutsideClick}
-              onKeyPress={viewportDialogState.onKeyPress}
-            />
-          )}
-        </div>
-        {/* The OHIFViewportActionCorners follows the viewport in the DOM so that it is naturally at a higher z-index.*/}
-        <OHIFViewportActionCorners viewportId={viewportId} />
-      </React.Fragment>
+
+        <MobileScrollSlider
+          element={enabledVPElement}
+          viewportId={viewportId}
+        />
+      </div>
     );
   },
   areEqual
